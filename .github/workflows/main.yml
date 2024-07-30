@@ -1,0 +1,28 @@
+name: 🎈 Deploy to Github-Dekwatdesign
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-via-tailscale:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: 🛡 Test - Host
+        run: host ${{ secrets.DEPLOY_HOSTNAME }}
+
+      - name: "📂 Checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: ✨ SFTP Sync
+        uses: milanmk/actions-file-deployer@master
+        with:
+          remote-protocol: sftp
+          remote-host: ${{ secrets.DEPLOY_HOSTNAME }}
+          remote-user: ${{ secrets.DEPLOY_USERNAME }}
+          ssh-private-key: ${{ secrets.DEPLOY_PRIVATE_KEY }}
+          remote-path: ${{ secrets.DEPLOY_REMOTE_PATH }}
+          sync: ${{ vars.DEPLOY_SYNC }} # (delta, full)
